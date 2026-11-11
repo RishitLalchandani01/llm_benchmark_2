@@ -1,0 +1,14 @@
+anthropic>=2.6        # rubric judge (Claude)
+openai>=2.0           # client for OpenAI-compatible servers: vLLM, Ollama, OpenRouter, Together, ...
+pyyaml
+numpy
+pandas
+scipy
+matplotlib
+pydantic
+pytest
+
+# Optional
+# sentence-transformers   # semantic divergence, Eq. 2      (llmeval similarity)
+# bert-score              # BERTScore F1 robustness check  (llmeval similarity)
+# mlx-lm                  # local Apple-silicon backend    (backend type: mlx)

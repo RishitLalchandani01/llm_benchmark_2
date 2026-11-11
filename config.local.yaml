@@ -1,0 +1,56 @@
+# Everything that fits on this Mac (M4 Pro, 24 GB) through Ollama. Ollama's default tags are 4-bit
+# (Q4_K_M), so the paper's bf16 condition becomes 4-bit here; the same scheme is used for every model,
+# as Sec. III-B requires, and must be reported. Check each tag with `ollama show <tag>`.
+# Qwen2.5 32B/72B and Llama 3.1 70B/405B do not fit in 24 GB; add them from config.paper.yaml
+# through an API backend, keeping in mind that their precision will then differ from this ladder's.
+
+run_name: local
+items_csv: llm_eval_prompt_matrix_300.csv
+output_dir: runs
+seed: 20261107
+
+decoding:
+  max_tokens: 1024
+  greedy_temperature: 0.0
+  k_samples: 5
+  sample_temperature: 0.7
+  sample_top_p: 0.95
+
+backends:
+  ollama:
+    type: openai_compat
+    base_url: http://localhost:11434/v1
+    concurrency: 2
+    hardware: "Apple M4 Pro, 24 GB, Ollama"
+  mlx:          # alternative local engine: pip install mlx-lm, model = an mlx-community repo
+    type: mlx
+    concurrency: 1
+    hardware: "Apple M4 Pro, 24 GB, MLX"
+
+models:
+  - {id: qwen2.5-0.5b, family: qwen2.5, ladder: primary, params_b: 0.49, backend: ollama, model: "qwen2.5:0.5b", precision: Q4_K_M}
+  - {id: qwen2.5-1.5b, family: qwen2.5, ladder: primary, params_b: 1.54, backend: ollama, model: "qwen2.5:1.5b", precision: Q4_K_M}
+  - {id: qwen2.5-3b,   family: qwen2.5, ladder: primary, params_b: 3.09, backend: ollama, model: "qwen2.5:3b",   precision: Q4_K_M}
+  - {id: qwen2.5-7b,   family: qwen2.5, ladder: primary, params_b: 7.61, backend: ollama, model: "qwen2.5:7b",   precision: Q4_K_M}
+  - {id: qwen2.5-14b,  family: qwen2.5, ladder: primary, params_b: 14.7, backend: ollama, model: "qwen2.5:14b",  precision: Q4_K_M}
+
+  - {id: llama3.1-8b,  family: llama3.1, ladder: secondary, params_b: 8.03, backend: ollama, model: "llama3.1:8b", precision: Q4_K_M}
+
+  - {id: phi3-mini,    family: phi3,    ladder: comparator, params_b: 3.82, backend: ollama, model: "phi3:3.8b",  precision: Q4_K_M}
+  - {id: mistral-7b,   family: mistral, ladder: comparator, params_b: 7.25, backend: ollama, model: "mistral:7b", precision: Q4_K_M}
+  - {id: gemma2-2b,    family: gemma2,  ladder: comparator, params_b: 2.61, backend: ollama, model: "gemma2:2b",  precision: Q4_K_M, system_in_user: true}
+  - {id: gemma2-9b,    family: gemma2,  ladder: comparator, params_b: 9.24, backend: ollama, model: "gemma2:9b",  precision: Q4_K_M, system_in_user: true}
+
+  # Same ladder through MLX instead, e.g.:
+  # - {id: qwen2.5-7b-mlx, family: qwen2.5, ladder: primary, params_b: 7.61, backend: mlx, model: mlx-community/Qwen2.5-7B-Instruct-4bit, precision: 4bit}
+
+judge:
+  model: claude-opus-5-5
+  effort: medium
+  concurrency: 8
+
+analysis:
+  bootstrap_resamples: 10000
+  fit_bootstrap_resamples: 1000
+  alpha: 0.05
+  mid_model: qwen2.5-3b

@@ -1,0 +1,20 @@
+# Dry run of the whole pipeline with no models: the oracle backend answers every item with its ground
+# truth, so numeric, exact-match, option and code items must score 1.0. Run with --no-judge to avoid
+# API calls; explanation items then stay unscored.
+
+run_name: oracle
+items_csv: llm_eval_prompt_matrix_300.csv
+output_dir: runs
+seed: 1
+
+decoding: {max_tokens: 1024, k_samples: 2}
+
+backends:
+  oracle: {type: oracle, concurrency: 8}
+
+models:
+  - {id: oracle-1b,  ladder: primary, params_b: 1,  backend: oracle, model: oracle}
+  - {id: oracle-4b,  ladder: primary, params_b: 4,  backend: oracle, model: oracle}
+  - {id: oracle-16b, ladder: primary, params_b: 16, backend: oracle, model: oracle}
+
+analysis: {bootstrap_resamples: 2000, fit_bootstrap_resamples: 100, alpha: 0.05}

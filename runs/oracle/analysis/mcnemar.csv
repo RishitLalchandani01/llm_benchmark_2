@@ -1,0 +1,9 @@
+subset,ladder,smaller,larger,larger_only_correct,smaller_only_correct,p,p_holm,significant
+all,primary,oracle-1b,oracle-4b,0,0,1.0,1.0,False
+domain=CODE,primary,oracle-1b,oracle-4b,0,0,1.0,1.0,False
+domain=FACT,primary,oracle-1b,oracle-4b,0,0,1.0,1.0,False
+domain=INST,primary,oracle-1b,oracle-4b,0,0,1.0,1.0,False
+domain=MATH,primary,oracle-1b,oracle-4b,0,0,1.0,1.0,False
+tier=basic,primary,oracle-1b,oracle-4b,0,0,1.0,1.0,False
+tier=intermediate,primary,oracle-1b,oracle-4b,0,0,1.0,1.0,False
+tier=advanced,primary,oracle-1b,oracle-4b,0,0,1.0,1.0,False

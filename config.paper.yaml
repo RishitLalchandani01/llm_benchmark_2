@@ -1,0 +1,72 @@
+# Full roster of Sec. III-B: local models served by vLLM on a GPU box at bf16, plus a versioned API
+# endpoint for Llama 3.1 405B. Fill in `version` with the exact HF revision / API version string.
+
+run_name: paper
+items_csv: llm_eval_prompt_matrix_300.csv
+output_dir: runs
+seed: 20261107
+
+decoding:
+  max_tokens: 1024          # output cap for all models
+  greedy_temperature: 0.0   # primary run
+  k_samples: 5              # variance runs
+  sample_temperature: 0.7
+  sample_top_p: 0.95
+
+backends:
+  vllm:
+    type: openai_compat
+    base_url: http://GPU-HOST:8000/v1     # vllm serve <model> --dtype bfloat16 --seed 0
+    concurrency: 16
+    hardware: "e.g. 8x H100 80GB"
+  openrouter:
+    type: openai_compat
+    base_url: https://openrouter.ai/api/v1
+    api_key_env: OPENROUTER_API_KEY
+    concurrency: 8
+    hardware: "API (provider-hosted)"
+
+models:
+  # Primary scaling ladder: Qwen2.5-Instruct
+  - {id: qwen2.5-0.5b, family: qwen2.5, ladder: primary, params_b: 0.49, backend: vllm, model: Qwen/Qwen2.5-0.5B-Instruct, version: "", precision: bf16}
+  - {id: qwen2.5-1.5b, family: qwen2.5, ladder: primary, params_b: 1.54, backend: vllm, model: Qwen/Qwen2.5-1.5B-Instruct, version: "", precision: bf16}
+  - {id: qwen2.5-3b,   family: qwen2.5, ladder: primary, params_b: 3.09, backend: vllm, model: Qwen/Qwen2.5-3B-Instruct,   version: "", precision: bf16}
+  - {id: qwen2.5-7b,   family: qwen2.5, ladder: primary, params_b: 7.61, backend: vllm, model: Qwen/Qwen2.5-7B-Instruct,   version: "", precision: bf16}
+  - {id: qwen2.5-14b,  family: qwen2.5, ladder: primary, params_b: 14.7, backend: vllm, model: Qwen/Qwen2.5-14B-Instruct,  version: "", precision: bf16}
+  - {id: qwen2.5-32b,  family: qwen2.5, ladder: primary, params_b: 32.5, backend: vllm, model: Qwen/Qwen2.5-32B-Instruct,  version: "", precision: bf16}
+  - {id: qwen2.5-72b,  family: qwen2.5, ladder: primary, params_b: 72.7, backend: vllm, model: Qwen/Qwen2.5-72B-Instruct,  version: "", precision: bf16}
+
+  # Secondary ladder (replication): Llama 3.1-Instruct
+  - {id: llama3.1-8b,   family: llama3.1, ladder: secondary, params_b: 8.03,  backend: vllm, model: meta-llama/Llama-3.1-8B-Instruct,  version: "", precision: bf16}
+  - {id: llama3.1-70b,  family: llama3.1, ladder: secondary, params_b: 70.6,  backend: vllm, model: meta-llama/Llama-3.1-70B-Instruct, version: "", precision: bf16}
+  - id: llama3.1-405b
+    family: llama3.1
+    ladder: secondary
+    params_b: 405.9
+    backend: openrouter
+    model: meta-llama/llama-3.1-405b-instruct
+    version: ""
+    precision: bf16
+    # Pin one provider at bf16 so requests are not silently routed to a quantized deployment.
+    extra_body: {provider: {order: ["PROVIDER-NAME"], allow_fallbacks: false, quantizations: ["bf16"]}}
+
+  # Compact, task-focused comparators
+  - {id: phi3-mini,    family: phi3,    ladder: comparator, params_b: 3.82, backend: vllm, model: microsoft/Phi-3-mini-4k-instruct, version: "", precision: bf16}
+  - {id: mistral-7b,   family: mistral, ladder: comparator, params_b: 7.25, backend: vllm, model: mistralai/Mistral-7B-Instruct-v0.3, version: "", precision: bf16}
+  - {id: gemma2-2b,    family: gemma2,  ladder: comparator, params_b: 2.61, backend: vllm, model: google/gemma-2-2b-it, version: "", precision: bf16, system_in_user: true}
+  - {id: gemma2-9b,    family: gemma2,  ladder: comparator, params_b: 9.24, backend: vllm, model: google/gemma-2-9b-it, version: "", precision: bf16, system_in_user: true}
+
+judge:
+  model: claude-opus-5-5    # fixed judge, outside every evaluated family
+  effort: medium
+  concurrency: 8
+
+similarity:
+  embedding_model: sentence-transformers/all-mpnet-base-v2
+  bertscore_model: roberta-large
+
+analysis:
+  bootstrap_resamples: 10000
+  fit_bootstrap_resamples: 1000
+  alpha: 0.05
+  mid_model: qwen2.5-7b     # 'mid-sized' model for the abstract's [X]/[Y]

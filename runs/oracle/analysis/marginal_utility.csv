@@ -1,0 +1,9 @@
+subset,ladder,from,to,N_from,N_to,doublings,MU_points_per_doubling,MU_lo,MU_hi
+all,primary,oracle-1b,oracle-4b,1,4,2.0,0.0,0.0,0.0
+domain=CODE,primary,oracle-1b,oracle-4b,1,4,2.0,0.0,0.0,0.0
+domain=FACT,primary,oracle-1b,oracle-4b,1,4,2.0,0.0,0.0,0.0
+domain=INST,primary,oracle-1b,oracle-4b,1,4,2.0,0.0,0.0,0.0
+domain=MATH,primary,oracle-1b,oracle-4b,1,4,2.0,0.0,0.0,0.0
+tier=basic,primary,oracle-1b,oracle-4b,1,4,2.0,0.0,0.0,0.0
+tier=intermediate,primary,oracle-1b,oracle-4b,1,4,2.0,0.0,0.0,0.0
+tier=advanced,primary,oracle-1b,oracle-4b,1,4,2.0,0.0,0.0,0.0
