@@ -11,6 +11,7 @@ import numpy as np
 import pandas as pd
 from scipy.optimize import OptimizeWarning, curve_fit
 from scipy.stats import binomtest
+from .log import log
 
 
 # ---------- curve fits (metric 5) ----------
@@ -113,7 +114,7 @@ def _ci(boot, alpha):
 
 
 def analyze(scores: pd.DataFrame, models, sim: pd.DataFrame = None, n_boot=10000, alpha=0.05,
-            fit_boot=1000, seed=0, progress=print) -> dict:
+            fit_boot=1000, seed=0, progress=log) -> dict:
     specs = {m.id: m for m in models if m.id in set(scores.model_id)}
     mids = list(specs)
     unscored = scores[scores.score.isna()]

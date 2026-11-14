@@ -16,6 +16,7 @@ import pandas as pd
 
 from .config import load_config
 from .items import load_items
+from .log import log
 
 
 def _models(cfg, names):
@@ -59,9 +60,37 @@ def cmd_run(cfg, args):
         run_model(cfg, spec, items, which=args.runs)
 
 
+BATCH_NOTICE = {
+    "Y": ("You have chosen batch mode: --batch Y.\n"
+          "Judge requests go through the Anthropic Message Batches API at 50% of the normal price.\n"
+          "Reminder: results usually arrive within 1 hour but can take up to 24 hours. This command waits\n"
+          "and checks every minute. If you stop it (Ctrl+C), the batch keeps running on Anthropic's side\n"
+          "and running the same command again collects the results."),
+    "N": ("You have chosen batch mode: --batch N.\n"
+          "WARNING: judge requests are sent one at a time at the full price, which is 2x the batch price.\n"
+          "Use --batch Y to pay 50% less, if you can wait (usually under 1 hour, at most 24 hours)."),
+}
+
+
+def _confirm_batch_mode(args):
+    if args.no_judge:
+        log(f"You have chosen batch mode: --batch {args.batch}. "
+            "The judge is disabled (--no-judge), so no API requests are made.")
+        return
+    log(BATCH_NOTICE[args.batch])
+    try:
+        answer = input("Do you want to continue? (Y/n) ").strip().lower()
+    except EOFError:
+        answer = "n"
+    if answer not in ("", "y", "yes"):
+        sys.exit("Stopped, nothing was sent.")
+
+
 def cmd_score(cfg, args):
     from .pipeline import score_all
-    df = score_all(cfg, load_items(cfg.items_csv), _models(cfg, args.models), use_judge=not args.no_judge)
+    _confirm_batch_mode(args)
+    df = score_all(cfg, load_items(cfg.items_csv), _models(cfg, args.models), use_judge=not args.no_judge,
+                   batch=args.batch == "Y")
     if df.empty:
         sys.exit("no responses to score")
     g = df[df.run == "greedy"].groupby("model_id").agg(accuracy=("score", "mean"),
@@ -111,6 +140,9 @@ def main(argv=None):
     s = sub.add_parser("score")
     s.add_argument("--models")
     s.add_argument("--no-judge", action="store_true", help="skip the rubric judge (EXPL items stay unscored)")
+    s.add_argument("--batch", required=True, type=str.upper, choices=["Y", "N"],
+                   help="Y: send judge requests through the Message Batches API (50%% cheaper, results within "
+                        "24 h, usually under 1 h). N: send them one at a time at full price")
     for name in ("similarity", "analyze"):
         sub.add_parser(name).add_argument("--models")
     he = sub.add_parser("human-export")

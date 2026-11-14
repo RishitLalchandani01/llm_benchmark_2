@@ -18,7 +18,9 @@ PY=.venv/bin/python
 $PY -m llmeval --config config.local.yaml validate        # dataset + scorers vs ground truth, no models
 $PY -m llmeval --config config.local.yaml run             # inference + logging (greedy + K=5 samples)
 $PY -m llmeval --config config.local.yaml run --models qwen2.5-0.5b --items MATH-B,CODE-B --runs greedy   # smoke test
-$PY -m llmeval --config config.local.yaml score           # extraction + scoring; EXPL items go to the Claude judge
+$PY -m llmeval --config config.local.yaml score --batch Y # extraction + scoring; EXPL items go to the Claude judge
+                                                         # --batch Y|N is required: Y = Message Batches API, 50% cheaper,
+                                                         # results within 24 h (usually < 1 h); N = immediate, full price
 $PY -m llmeval --config config.local.yaml similarity      # Eq. 2 + BERTScore (pip install sentence-transformers bert-score)
 $PY -m llmeval --config config.local.yaml analyze         # metrics, fits, CIs, tests, figures, summary.md
 $PY -m llmeval --config config.local.yaml human-export --n 100   # blinded sheets for two human graders

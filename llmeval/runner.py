@@ -16,6 +16,7 @@ from datetime import datetime, timezone
 
 from .backends import make_backend
 from .prompting import TEMPLATE_VERSION, build_messages
+from .log import log
 
 
 def run_ids(k_samples: int, which: str) -> list:
@@ -43,7 +44,7 @@ def load_responses(path) -> dict:
     return out
 
 
-def run_model(cfg, spec, items, which="all", progress=print):
+def run_model(cfg, spec, items, which="all", progress=log):
     dec = cfg.decoding
     bspec = cfg.backends[spec.backend]
     backend = make_backend(bspec, items=items)

@@ -10,6 +10,7 @@ import pandas as pd
 from .judge import Judge
 from .runner import load_responses, responses_path
 from .scoring import score_response
+from .log import log
 
 
 class _ScoreCache:
@@ -38,7 +39,7 @@ class _ScoreCache:
         return dict(self.data[k])
 
 
-def score_all(cfg, items, models, use_judge=True, progress=print) -> pd.DataFrame:
+def score_all(cfg, items, models, use_judge=True, progress=log, batch=False) -> pd.DataFrame:
     by_id = {it.item_id: it for it in items}
     cache = _ScoreCache(os.path.join(cfg.run_dir, "score_cache.jsonl"))
     records = []
@@ -62,7 +63,7 @@ def score_all(cfg, items, models, use_judge=True, progress=print) -> pd.DataFram
     rubric = [r for r in records if r["rule"] == "rubric"]
     if rubric and use_judge:
         judge = Judge(cfg.judge, os.path.join(cfg.run_dir, "judge_cache.jsonl"))
-        verdicts = judge.grade_many([(by_id[r["item_id"]], r["judge_text"]) for r in rubric], progress)
+        verdicts = judge.grade_many([(by_id[r["item_id"]], r["judge_text"]) for r in rubric], progress, batch=batch)
         n_err = 0
         for r, v in zip(rubric, verdicts):
             if v["error"]:

@@ -12,9 +12,10 @@ import pandas as pd
 
 from .extract import first_line
 from .runner import load_responses, responses_path
+from .log import log
 
 
-def compute(cfg, scores: pd.DataFrame, items, models, progress=print) -> pd.DataFrame:
+def compute(cfg, scores: pd.DataFrame, items, models, progress=log) -> pd.DataFrame:
     from sentence_transformers import SentenceTransformer
 
     by_id = {it.item_id: it for it in items}
