@@ -35,12 +35,43 @@ models:
   - {id: qwen2.5-14b,  family: qwen2.5, ladder: primary, params_b: 14.7, backend: ollama, model: "qwen2.5:14b",  precision: Q4_K_M}
 
   - {id: llama3.1-8b,  family: llama3.1, ladder: secondary, params_b: 8.03, backend: ollama, model: "llama3.1:8b", precision: Q4_K_M}
-
+  ## only other llama3.1 models are 70B and 405B, which do not fit in 24 GB; add them from config.paper.yaml through an API backend
   - {id: phi3-mini,    family: phi3,    ladder: comparator, params_b: 3.82, backend: ollama, model: "phi3:3.8b",  precision: Q4_K_M}
   - {id: mistral-7b,   family: mistral, ladder: comparator, params_b: 7.25, backend: ollama, model: "mistral:7b", precision: Q4_K_M}
   - {id: gemma2-2b,    family: gemma2,  ladder: comparator, params_b: 2.61, backend: ollama, model: "gemma2:2b",  precision: Q4_K_M, system_in_user: true}
   - {id: gemma2-9b,    family: gemma2,  ladder: comparator, params_b: 9.24, backend: ollama, model: "gemma2:9b",  precision: Q4_K_M, system_in_user: true}
+#### NEW
+  - {id: llama3.2-1b,  family: llama3.2, ladder: comparator, params_b: 1.24, backend: ollama, model: "llama3.2:1b", precision: Q4_K_M}
+  - {id: llama3.2-3b,  family: llama3.2, ladder: comparator, params_b: 3.21, backend: ollama, model: "llama3.2:3b", precision: Q4_K_M}
+  - {id: llama3.2-vision-11b,  family: llama3.2, ladder: comparator, params_b: 10.7, backend: ollama, model: "llama3.2-vision:11b", precision: Q4_K_M}
+# above is not supported by M4. ERROR = Error: 500 Internal Server Error: llama-server process has terminated: exit status 1: error loading model: unknown model architecture: 'mllama'. error loading model: unknown model architecture: 'mllama'
+# This error occurs because the llama-server backend engine in your current version of Ollama does not recognize the mllama architecture used by Meta's Llama 3.2 Vision models. When Ollama routes model execution through llama.cpp, lack of support for the mllama architecture causes the server process to crash with an exit status 1 immediately after a successful download.
 
+  - {id: llama3-8b,  family: llama3, ladder: comparator, params_b: 8.03, backend: ollama, model: "llama3:8b", precision: Q4_K_M}
+# no point on running 3-8b since its alone
+  - {id: llama2-7b,  family: llama2, ladder: comparator, params_b: 6.74, backend: ollama, model: "llama2:7b", precision: Q4_K_M}
+  - {id: llama2-13b,  family: llama2, ladder: comparator, params_b: 6.74, backend: ollama, model: "llama2:13b", precision: Q4_K_M}
+  - {id: codellama-13b,  family: codellama, ladder: comparator, params_b: 13.0, backend: ollama, model: "codellama:13b", precision: Q4_K_M}
+  - {id: codellama-7b,  family: codellama, ladder: comparator, params_b: 6.74, backend: ollama, model: "codellama:7b", precision: Q4_K_M}
+  - {id: gemma3-270m,    family: gemma3,  ladder: comparator, params_b: 0.27, backend: ollama, model: "gemma3:270m",  precision: Q4_K_M, system_in_user: true} 
+  - {id: gemma3-1b,    family: gemma3,  ladder: comparator, params_b: 1.0, backend: ollama, model: "gemma3:1b",  precision: Q4_K_M, system_in_user: true}
+  - {id: gemma3-4b,    family: gemma3,  ladder: comparator, params_b: 1.0, backend: ollama, model: "gemma3:4b",  precision: Q4_K_M, system_in_user: true}
+  - {id: gemma3-12b,    family: gemma3,  ladder: comparator, params_b: 1.0, backend: ollama, model: "gemma3:12b",  precision: Q4_K_M, system_in_user: true}
+  - {id: phi3-medium,    family: phi3,    ladder: comparator, params_b: 14.0, backend: ollama, model: "phi3:14b",  precision: Q4_K_M}
+  # does it make sense to run phi3-14b ( since no other parameter for phi3) and phi4-mini on the same ladder? They are not in the same family, but they are close in size. The paper's ladder is based on size, not family.
+ 
+  - {id: phi4-mini,    family: phi4,    ladder: comparator, params_b: 3.84, backend: ollama, model: "phi4-mini:3.8b",  precision: Q4_K_M}
+  - {id: phi4-14b,    family: phi4,    ladder: comparator, params_b: 14.7, backend: ollama, model: "phi4:14b",  precision: Q4_K_M} # phi4-14b:14.7b or phi4:14b
+ 
+
+  - {id: qwen2.5-coder-1.5b, family: qwen2.5-coder, ladder: comparator, params_b: 1.54, backend: ollama, model: "qwen2.5-coder:1.5b", precision: Q4_K_M}
+  - {id: qwen2.5-coder-3b, family: qwen2.5-coder, ladder: comparator, params_b: 3.09, backend: ollama, model: "qwen2.5-coder:3b", precision: Q4_K_M}
+  - {id: qwen2.5-coder-7b, family: qwen2.5-coder, ladder: comparator, params_b: 7.61, backend: ollama, model: "qwen2.5-coder:7b", precision: Q4_K_M}
+  - {id: qwen2.5-coder-14b, family: qwen2.5-coder, ladder: comparator, params_b: 14.7, backend: ollama, model: "qwen2.5-coder:14b", precision: Q4_K_M}
+
+  - {id: mistral-nemo-12b,    family: mistral,    ladder: comparator, params_b: 12.2, backend: ollama, model: "mistral-nemo:12b",  precision: Q4_K_M}  
+  - {id: mistral3-nemo-24b,    family: mistral,    ladder: comparator, params_b: 23.6, backend: ollama, model: "mistral-small3.2:24b",  precision: Q4_K_M}
+  
   # Same ladder through MLX instead, e.g.:
   # - {id: qwen2.5-7b-mlx, family: qwen2.5, ladder: primary, params_b: 7.61, backend: mlx, model: mlx-community/Qwen2.5-7B-Instruct-4bit, precision: 4bit}
 

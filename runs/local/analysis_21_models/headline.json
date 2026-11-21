@@ -1,0 +1,9 @@
+{
+  "smallest": "qwen2.5-0.5b",
+  "mid": "qwen2.5-3b",
+  "largest": "qwen2.5-14b",
+  "X_points_small_to_mid": 36.633333333333326,
+  "Y_points_mid_to_large": 27.78650793650796,
+  "Z_cost_factor_small_to_large": 36.246723764317416,
+  "cost_factor_mid_to_large": 5.5913888479033265
+}
